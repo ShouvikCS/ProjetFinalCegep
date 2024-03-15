@@ -19,4 +19,12 @@ class Employee(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-#TODO commandes avec lignes de commandes + clients
+class Command(models.Model):
+    client_name = models.CharField(max_length=100) 
+    email = models.EmailField()                     
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+class CommandLine(models.Model):
+    command = models.ForeignKey(Command, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
