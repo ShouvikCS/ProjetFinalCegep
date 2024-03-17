@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Employee, Product
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .serializers import ProductSerializer
@@ -15,3 +16,8 @@ def get_data(request):
     data = Product.objects.all()
     serializer = ProductSerializer(data, many=True)
     return Response(serializer.data)
+
+
+class ProductListView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
