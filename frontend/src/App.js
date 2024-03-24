@@ -4,6 +4,7 @@ import logo from './logo.svg';
 import './App.css';
 import LoginForm from './components/LoginForm';
 import Inventory from './components/Inventory';
+import AddProductForm from './components/AddProductForm';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<Inventory />} />
+          <Route path="/add" element={<AddProductForm />} />
         </Routes>
       </div>
     </Router>
