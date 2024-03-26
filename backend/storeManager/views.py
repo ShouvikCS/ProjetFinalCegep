@@ -36,3 +36,24 @@ class ProductCreateAPIView(generics.CreateAPIView):
 class ProductUpdateAPIView(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response["Access-Control-Allow-Methods"] = "GET"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return self.update(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        response = super().put(request, *args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response["Access-Control-Allow-Methods"] = "PUT"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        response = super().patch(request, *args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response["Access-Control-Allow-Methods"] = "PATCH"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return self.partial_update(request, *args, **kwargs)

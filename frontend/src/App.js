@@ -5,6 +5,7 @@ import './App.css';
 import LoginForm from './components/LoginForm';
 import Inventory from './components/Inventory';
 import AddProductForm from './components/AddProductForm';
+import UpdateProductForm from './components/UpdateProductForm';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<Inventory />} />
           <Route path="/add" element={<AddProductForm />} />
+          <Route path="update/:id" element={<UpdateProductForm />} />
         </Routes>
       </div>
     </Router>
