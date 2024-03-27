@@ -4,7 +4,6 @@ import axios from 'axios';
 
 const UpdateProductForm = () => {
     const { id } = useParams();
-    const [product, setProduct] = useState({});
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -15,9 +14,19 @@ const UpdateProductForm = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/updateproducts/${id}/`);
-                setProduct(response.data);
-                setFormData(response.data);
+                const response = await axios.get(`http://localhost:8080/products/${id}/`);
+                const productData = response.data;
+                if (productData && Object.keys(productData).length > 0) {
+                    setFormData({
+                        name: productData[id - 1].name || '',
+                        category: productData[id - 1].category || '',
+                        price: productData[id - 1].price || 0,
+                        quantity: productData[id - 1].quantity || 0
+                    });
+                    console.log('Product data:', productData); //wow this was really useful im ngl
+                } else {
+                    console.error('Product data is empty or invalid.');
+                }
             } catch (error) {
                 console.error('Error fetching product:', error);
             }
