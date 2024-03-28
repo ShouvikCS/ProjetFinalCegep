@@ -3,6 +3,7 @@ from .models import Employee, Product
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import status
 from .serializers import ProductSerializer
 
 def home(request):
@@ -108,3 +109,17 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
         response["Access-Control-Allow-Methods"] = "PATCH"
         response["Access-Control-Allow-Headers"] = "Content-Type"
         return self.partial_update(request, *args, **kwargs)
+    
+
+class ProductDeleteAPIView(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": str(e)})
+

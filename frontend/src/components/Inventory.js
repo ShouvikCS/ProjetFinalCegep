@@ -18,8 +18,13 @@ const Inventory = () => {
         fetchProducts();
     }, []);
 
-    const handleRemoveProduct = (productId) => {
-        console.log('Removing product with id:', productId);
+    const handleRemoveProduct = async (productId) => {
+        try {
+            await axios.delete(`http://127.0.0.1:8080/deleteproducts/${productId}/`);
+            setProducts(products.filter(product => product.id !== productId));
+        } catch (error) {
+            console.error('Error removing product:', error);
+        }
     };
 
     return (

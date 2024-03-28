@@ -20,8 +20,8 @@ const AddProductForm = () => {
             // Reset form fields
             setName('');
             setCategory('');
-            setPrice('');
-            setQuantity('');
+            setPrice(''); 
+            setQuantity(''); 
         } catch (error) {
             console.error('Error adding product:', error);
             alert('Failed to add product. Please try again.');
