@@ -14,8 +14,11 @@ const LoginForm = () => {
                     Password:
                     <input type="password" style={styles.input} />
                 </label>
-                <Link to="/dashboard" style={styles.link}>
-                    Login
+                <Link to="/manager/dashboard" style={styles.link}>
+                    Login as Manager
+                </Link>
+                <Link to="/employee/dashboard" style={styles.link}>
+                    Login as Employee
                 </Link>
             </form>
         </div>

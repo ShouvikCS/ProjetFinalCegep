@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Inventory = () => {
     const [products, setProducts] = useState([]);
@@ -21,14 +22,6 @@ const Inventory = () => {
         console.log('Removing product with id:', productId);
     };
 
-    const handleModifyProduct = (productId) => {
-        console.log('Modifying product with id:', productId);
-    };
-
-    const handleAddProduct = () => {
-        console.log('Adding a new product');
-    };
-
     return (
         <div>
             <h2>Product List</h2>
@@ -39,12 +32,16 @@ const Inventory = () => {
                         <strong>Category:</strong> {product.category}<br />
                         <strong>Price:</strong> {product.price} USD<br />
                         <strong>Quantity:</strong> {product.quantity}<br />
+                        <Link to={`/manager/inventory/update/${product.id}`}>
+                            <button>Modify</button>
+                        </Link>
                         <button onClick={() => handleRemoveProduct(product.id)}>Remove</button>
-                        <button onClick={() => handleModifyProduct(product.id)}>Modify</button>
                     </div>
                 ))}
             </div>
-            <button onClick={handleAddProduct}>Add a new product</button>
+            <Link to="/manager/inventory/add">
+                <button>Add a new product</button>
+            </Link>
         </div>
     );
 };
