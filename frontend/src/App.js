@@ -13,7 +13,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-          welcome to my app
         <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginForm />} />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 
 const UpdateProductForm = () => {
@@ -50,21 +51,31 @@ const UpdateProductForm = () => {
     };
 
     return (
+        <div>
         <form onSubmit={handleSubmit}>
-            <label>Name:</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} />
-
-            <label>Category:</label>
-            <input type="text" name="category" value={formData.category} onChange={handleChange} />
-
-            <label>Price:</label>
-            <input type="number" name="price" value={formData.price} onChange={handleChange} />
-
-            <label>Quantity:</label>
-            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} />
-
+            <div>
+                <label>Name:</label>
+                <input type="text" name="name" value={formData.name} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Category:</label>
+                <input type="text" name="category" value={formData.category} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Price:</label>
+                <input type="number" name="price" value={formData.price} onChange={handleChange} />
+            </div>
+            <div>
+                <label>Quantity:</label>
+                <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} />
+            </div>
             <button type="submit">Update Product</button>
         </form>
+        <br></br>
+                <Link to={"/manager/inventory"}>
+            <button>{"back to inventory"}</button>
+        </Link>
+        </div>
     );
 };
 

@@ -47,6 +47,10 @@ const Inventory = () => {
             <Link to="/manager/inventory/add">
                 <button>Add a new product</button>
             </Link>
+            <br></br>
+                <Link to={"/login"}>
+            <button>{"back to login"}</button>
+        </Link>
         </div>
     );
 };

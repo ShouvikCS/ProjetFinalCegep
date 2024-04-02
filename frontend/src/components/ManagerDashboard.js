@@ -9,6 +9,10 @@ const ManagerDashboard = () => {
             <Link to="/manager/inventory">
                     Inventory
                 </Link>
+                <br></br>
+                <Link to={"/login"}>
+            <button>{"back to login"}</button>
+        </Link>
         </div>
     );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 
 const AddProductForm = () => {
@@ -50,6 +51,10 @@ const AddProductForm = () => {
                 </div>
                 <button type="submit">Add Product</button>
             </form>
+            <br></br>
+                <Link to={"/manager/inventory"}>
+            <button>{"back to inventory"}</button>
+        </Link>
         </div>
     );
 };
