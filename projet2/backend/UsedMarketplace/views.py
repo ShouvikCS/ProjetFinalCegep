@@ -88,11 +88,12 @@ def login_view(request):
     try:
 
         user = User.objects.get(username=username)
+        #user = authenticate(username='username', password='password')
         print(user.id)
     except User.DoesNotExist:
 
-        return JsonResponse({"error": "Invalid credentials"}, status=400)
-
+        return JsonResponse({"error": "User does not exist"}, status=400)
+    user.set_password(password)
     if user.check_password(password):
 
         login(request, user)
