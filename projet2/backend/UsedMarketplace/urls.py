@@ -5,4 +5,10 @@ urlpatterns = [
     path('posts/create/', views.PostCreateAPIView.as_view(), name='post-create'),
     path('posts/<int:pk>/update/', views.PostUpdateAPIView.as_view(), name='post-update'),
     path('posts/<int:pk>/delete/', views.PostDeleteAPIView.as_view(), name='post-delete'),
+    path('posts/', views.PostListAPIView.as_view(), name='post-list'), 
+    path('posts/<int:pk>/', views.PostDetailAPIView.as_view(), name='post-detail'),  
+    path('posts/<int:pk>/comments/', views.CommentListAPIView.as_view(), name='post-comments'),  
+    path('user/<int:pk>/posts/', views.UserPostListAPIView.as_view(), name='user-post-list'), 
+    path('login/', views.UserLoginAPIView.as_view(), name='user-login'),
+    path('signup/', views.UserSignupAPIView.as_view(), name='user-signup'),
 ]
