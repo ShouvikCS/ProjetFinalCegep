@@ -1,10 +1,16 @@
+import json
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.http import JsonResponse
+from django.views.generic import View
 from rest_framework.authtoken.models import Token
 from .models import Post, Comment, User
 from .serializers import CommentSerializer, PostSerializer, UserSerializer
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class PostCreateAPIView(generics.CreateAPIView):
     queryset = Post.objects.all()
@@ -46,21 +52,60 @@ class UserPostListAPIView(generics.ListAPIView):
         user_id = self.kwargs['pk']
         return Post.objects.filter(user_id=user_id)
     
-class UserLoginAPIView(generics.GenericAPIView):
-    serializer_class = UserSerializer
 
-    def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key})
-        else:
-            return Response({'error': 'Invalid credentials'}, status=400)
 
-class UserSignupAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+# @method_decorator(csrf_exempt, name='dispatch')
+# class CustomLoginView(View):
+#     def post(self, request):
+#         data = json.loads(request.body)
+#         email = data.get('email')
+#         password = data.get('password')
+
+#         user = authenticate(request, username=email, password=password)  
+#         if user is not None:
+#             login(request, user)
+#             return JsonResponse({'message': 'Login successful'}, status=200)
+#         else:
+#             return JsonResponse({'error': 'Invalid email or password'}, status=400)
+
+        
+        
+
+# class CustomLogoutView(View):
+#     def post(self, request):
+#         logout(request)
+#         return JsonResponse({'message': 'Logout successful'})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def login_view(request):
+    User = get_user_model()
+    data = json.loads(request.body)
+    username = data.get('username')
+    password = data.get('password')
+    print(username, password)
+    try:
+
+        user = User.objects.get(username=username)
+        print(user.id)
+    except User.DoesNotExist:
+
+        return JsonResponse({"error": "Invalid credentials"}, status=400)
+
+    if user.check_password(password):
+
+        login(request, user)
+        return JsonResponse({"message": "Login successful"}, status=200)
+    else:
+        return JsonResponse({"error": "Invalid credentials"}, status=400)
+    
+@require_http_methods(["POST"])
+def logout_view(request):
+    logout(request)
+    return JsonResponse({"message": "Logged out successfully"}, status=200)
+
+
+class CustomSignupView(View):
+    def post(self, request):
+        return JsonResponse({'message': 'Signup successful'})
