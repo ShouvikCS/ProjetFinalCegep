@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.generic import View
 from rest_framework.authtoken.models import Token
@@ -53,30 +54,6 @@ class UserPostListAPIView(generics.ListAPIView):
         return Post.objects.filter(user_id=user_id)
     
 
-
-# @method_decorator(csrf_exempt, name='dispatch')
-# class CustomLoginView(View):
-#     def post(self, request):
-#         data = json.loads(request.body)
-#         email = data.get('email')
-#         password = data.get('password')
-
-#         user = authenticate(request, username=email, password=password)  
-#         if user is not None:
-#             login(request, user)
-#             return JsonResponse({'message': 'Login successful'}, status=200)
-#         else:
-#             return JsonResponse({'error': 'Invalid email or password'}, status=400)
-
-        
-        
-
-# class CustomLogoutView(View):
-#     def post(self, request):
-#         logout(request)
-#         return JsonResponse({'message': 'Logout successful'})
-
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def login_view(request):
@@ -86,9 +63,9 @@ def login_view(request):
     password = data.get('password')
     print(username, password)
     try:
-
+        user = authenticate(username='username', password='password')
         user = User.objects.get(username=username)
-        #user = authenticate(username='username', password='password')
+       
         print(user.id)
     except User.DoesNotExist:
 
@@ -110,3 +87,12 @@ def logout_view(request):
 class CustomSignupView(View):
     def post(self, request):
         return JsonResponse({'message': 'Signup successful'})
+    
+
+#@login_required
+def current_user(request):
+    print(request.user, "request.user")
+    return JsonResponse({
+        'id': request.user.id,
+        'username': request.user.username
+    })

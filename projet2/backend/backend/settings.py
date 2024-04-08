@@ -33,12 +33,12 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'UsedMarketplace',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'UsedMarketplace',
     'rest_framework',
     'corsheaders',
 ]
@@ -137,3 +137,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'UsedMarketplace.User'
+CORS_ALLOW_CREDENTIALS = True

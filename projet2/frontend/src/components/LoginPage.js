@@ -10,7 +10,8 @@ function Login() {
         try {
             const response = await axios.post('http://127.0.0.1:8000/login/', { username, password });
             console.log('Login successful:', response.data);
-            // Redirect or update state as needed
+            // Redirect to /dashboard upon successful login
+            window.location.href = '/dashboard';
         } catch (error) {
             console.error('Login failed:', error.response.data);
             // Handle error, show message, etc.
