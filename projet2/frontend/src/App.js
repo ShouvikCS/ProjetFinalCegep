@@ -5,6 +5,8 @@ import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
 import AllPosts from './components/AllPosts';
+import AddPost from './components/AddPost';
+import ModifyPost from './components/ModifyPost';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/allposts" element={<AllPosts />} />
+          <Route path="/dashboard/addpost" element={<AddPost />} />
+          <Route path="/dashboard/modifypost/:postId" element={<ModifyPost />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       </div>
