@@ -1,0 +1,15 @@
+.auth-card {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+  }
+  
+  .auth-card .btn-success {
+    background-color: #4CAF50;
+    border-color: #3e8e41;
+  }
+  

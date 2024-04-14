@@ -1,0 +1,26 @@
+.toggle-switch {
+    display: flex;
+    border: 2px solid #4CAF50; /* Green border */
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  
+  .toggle-btn {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    background-color: #f0f0f0;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .toggle-btn.inactive {
+    background-color: #ccc;
+    color: #666;
+  }
+  
+  .toggle-btn:not(.inactive) {
+    background-color: #4CAF50; /* Green background for active state */
+    color: white;
+  }
+  

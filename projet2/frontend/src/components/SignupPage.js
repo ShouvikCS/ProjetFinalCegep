@@ -1,78 +1,43 @@
 import React, { useState } from 'react';
+import { Form, Button, Card } from 'react-bootstrap';
+import './FormStyles.css'; // Reuse styles
 
 function SignupPage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState({ username: '', email: '', password: '', confirmPassword: '' });
+  const [errors, setErrors] = useState({});
 
   const handleSignup = (e) => {
     e.preventDefault();
-
-    let newErrors = {};
-
-    // Validate username
-    if (!username) {
-      newErrors.username = 'Username is required';
-    }
-
-    // Validate email
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Invalid email address';
-    }
-
-    // Validate password
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters long';
-    }
-
-    // Validate confirm password
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors);
-
+    // Validation logic here
     // Perform signup logic here if no errors
-    if (Object.keys(newErrors).length === 0) {
-      // Signup logic
-    }
   };
 
   return (
-    <div className="container">
-      <h1 className="title">Sign Up</h1>
-      <form onSubmit={handleSignup}>
-        <div>
-          <label>Username:</label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-          {errors.username && <span className="error">{errors.username}</span>}
-        </div>
-        <div>
-          <label>Email:</label>
-          <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
-          {errors.email && <span className="error">{errors.email}</span>}
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          {errors.password && <span className="error">{errors.password}</span>}
-        </div>
-        <div>
-          <label>Confirm Password:</label>
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-          {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
+    <Card className="auth-card">
+      <Card.Body>
+        <Card.Title>Sign Up</Card.Title>
+        <Form onSubmit={handleSignup}>
+          <Form.Group controlId="signupUsername">
+            <Form.Label>Username</Form.Label>
+            <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter username" />
+            {errors.username && <small className="text-danger">{errors.username}</small>}
+            <br />
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
+            {errors.email && <small className="text-danger">{errors.email}</small>}
+            <br />
+            <Form.Label>Password</Form.Label>
+            <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+            {errors.password && <small className="text-danger">{errors.password}</small>}
+
+          </Form.Group>
+          <Button variant="success" type="submit">Sign Up</Button>
+        </Form>
+      </Card.Body>
+    </Card>
   );
 }
 

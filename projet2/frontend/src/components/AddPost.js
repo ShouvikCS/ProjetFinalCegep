@@ -14,7 +14,9 @@ function AddPost() {
 
         };
 
-        axios.post('http://127.0.0.1:8000/posts/', postData)
+        axios.post('http://127.0.0.1:8000/posts/create/', postData, {
+            withCredentials: true
+        })
             .then(response => {
                 console.log(response.data);
                 alert('Post added successfully!');
