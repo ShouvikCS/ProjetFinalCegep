@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.generic import View
 from rest_framework.authtoken.models import Token
-from .models import Post, Comment, User
-from .serializers import CommentSerializer, PostSerializer, UserSerializer
+from .models import Post, Comment, User, Image
+from .serializers import CommentSerializer, PostSerializer, UserSerializer, ImageSerializer
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 class PostCreateAPIView(generics.CreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -24,16 +24,32 @@ class PostCreateAPIView(generics.CreateAPIView):
 class PostUpdateAPIView(generics.UpdateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class PostDeleteAPIView(generics.DestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
 class PostListAPIView(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        for post in queryset:
+            print(f"Post ID: {post.id} belongs to User: {post.user.username}")
+            print(f"current user {request.user}")
+            print(f"is_authenticated {request.user.is_authenticated}")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 class PostDetailAPIView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
@@ -57,6 +73,11 @@ class UserPostListAPIView(generics.ListAPIView):
 @csrf_exempt
 @require_http_methods(["POST"])
 def login_view(request):
+
+    if request.user.is_authenticated:
+        print("Attempt to log in when already authenticated")
+        return JsonResponse({"error": "Logout before logging in again."}, status=400)
+
     User = get_user_model()
     data = json.loads(request.body)
     username = data.get('username')
@@ -74,9 +95,13 @@ def login_view(request):
     if user.check_password(password):
 
         login(request, user)
+        print(request.user, "request.user")
         return JsonResponse({"message": "Login successful"}, status=200)
     else:
         return JsonResponse({"error": "Invalid credentials"}, status=400)
+    
+
+
     
 @require_http_methods(["POST"])
 def logout_view(request):
@@ -88,6 +113,7 @@ class CustomSignupView(View):
     def post(self, request):
         return JsonResponse({'message': 'Signup successful'})
     
+    
 
 #@login_required
 def current_user(request):
@@ -96,3 +122,11 @@ def current_user(request):
         'id': request.user.id,
         'username': request.user.username
     })
+
+
+
+class PostImagesView(View):
+    def get(self, request, post_id):
+        images = Image.objects.filter(post_id=post_id)
+        serializer = ImageSerializer(images, many=True)
+        return Response(serializer.data)

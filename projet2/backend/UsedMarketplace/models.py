@@ -1,19 +1,23 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Users must have an email address')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+    def create_user(self, username, password=None, **extra_fields):
+        """
+        Create and save a User with the given username and password.
+        """
+        if not username:
+            raise ValueError('The given username must be set')
+        user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, username, password, **extra_fields):
+        """
+        Create and save a SuperUser with the given username and password.
+        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -22,21 +26,22 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(username, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=30, blank=True)
+    username = models.CharField(max_length=30, unique=True)
+    email = models.EmailField()
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     
     objects = UserManager()
     
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']  # Email is not required by default for login, but is required during user creation.
 
     def __str__(self):
-        return self.email
+        return self.username
+
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
