@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.generic import View
 from rest_framework.authtoken.models import Token
-from .models import Post, Comment, User, Image
+from .models import CurrentUser, Post, Comment, User, Image
 from .serializers import CommentSerializer, PostSerializer, UserSerializer, ImageSerializer
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -96,6 +96,12 @@ def login_view(request):
 
         login(request, user)
         print(request.user, "request.user")
+
+        CurrentUser.objects.update_or_create(
+            user_id=user.id,
+            defaults={'username': user.username, 'logged_in': True}
+        )
+
         return JsonResponse({"message": "Login successful"}, status=200)
     else:
         return JsonResponse({"error": "Invalid credentials"}, status=400)
@@ -117,11 +123,17 @@ class CustomSignupView(View):
 
 #@login_required
 def current_user(request):
-    print(request.user, "request.user")
-    return JsonResponse({
-        'id': request.user.id,
-        'username': request.user.username
-    })
+    try:
+        current_user = CurrentUser.objects.first()
+        if current_user and current_user.logged_in:
+            return JsonResponse({
+                'id': current_user.user_id,
+                'username': current_user.username
+            })
+        else:
+            return JsonResponse({'error': 'No currently logged-in user'}, status=404)
+    except CurrentUser.DoesNotExist:
+        return JsonResponse({'error': 'No user data available'}, status=404)
 
 
 

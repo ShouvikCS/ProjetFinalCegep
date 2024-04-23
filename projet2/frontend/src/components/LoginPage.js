@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import { Form, Button, Card } from 'react-bootstrap';
 import './FormStyles.css'; 
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+axios.defaults.withCredentials = true;
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();  // Hook for navigation
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://127.0.0.1:8000/login/', { username, password });
       console.log('Login successful:', response.data);
-      window.location.href = '/dashboard'; // Redirect upon success
+      navigate('/dashboard'); // Navigate upon success
     } catch (error) {
       console.error('Login failed:', error.response?.data);
     }

@@ -42,6 +42,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+class CurrentUser(models.Model):
+    user_id = models.IntegerField(unique=True) 
+    username = models.CharField(max_length=150, unique=True)  
+    logged_in = models.BooleanField(default=False) 
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
