@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ImageSlideshow from './ImageSlideshow'; // Import the slideshow component
 
 function AllPosts() {
     const [posts, setPosts] = useState([]);
@@ -16,14 +17,7 @@ function AllPosts() {
         <div style={{ padding: '20px' }}>
             {posts.map((post) => (
                 <div key={post.id} style={{ marginBottom: '40px', border: '1px solid #ccc', padding: '20px', borderRadius: '5px' }}>
-                    {post.images.map((image) => (
-                        <img 
-                            key={image.id}
-                            src={`${image.image}`}
-                            alt="Post Visual"
-                            style={{ width: '100%', maxWidth: '600px', height: 'auto', marginBottom: '20px' }}
-                        />
-                    ))}
+                    <ImageSlideshow images={post.images.map(img => img.image)} />
                     <h3>Posted by: User {post.user}</h3>
                     <h2>{post.title}</h2>
                     <p>{post.description}</p>
