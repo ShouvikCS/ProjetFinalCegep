@@ -4,25 +4,40 @@ import axios from 'axios';
 function AddPost() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [images, setImages] = useState([]);
 
-    const handleSubmit = (event) => {
+    const handleFileChange = (event) => {
+        if (event.target.files.length > 10) {
+            alert("You can only upload a maximum of 10 images");
+            return;
+        }
+        setImages(event.target.files);
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const postData = {
-            user_id: 2, // Temporarily hardcoded
-            title,
-            description,
 
-        };
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('user', 2); // This should be dynamically fetched if possible
 
-        axios.post('http://127.0.0.1:8000/posts/create/', postData, {
-            withCredentials: true
-        })
-            .then(response => {
-                console.log(response.data);
-                alert('Post added successfully!');
+        for (let i = 0; i < images.length; i++) {
+            formData.append('images', images[i]);
+        }
 
-            })
-            .catch(error => console.error('There was an error adding the post:', error));
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/posts/create/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                withCredentials: true
+            });
+            console.log(response.data);
+            alert('Post added successfully!');
+        } catch (error) {
+            console.error('There was an error adding the post:', error.response ? error.response.data : error);
+        }
     };
 
     return (
@@ -38,8 +53,8 @@ function AddPost() {
                     <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
                 </div>
                 <div>
-                    <label>Add Images Here:</label>
-                    <input type="file" disabled />
+                    <label>Add Images Here (up to 10):</label>
+                    <input type="file" multiple onChange={handleFileChange} />
                 </div>
                 <button type="submit">Add Post</button>
             </form>

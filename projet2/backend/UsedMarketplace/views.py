@@ -12,14 +12,33 @@ from .serializers import CommentSerializer, PostSerializer, UserSerializer, Imag
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.forms.models import model_to_dict
+from .forms import PostForm
 
-class PostCreateAPIView(generics.CreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny]
+@csrf_exempt
+def PostCreateAPIView(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = User.objects.get(pk=2)   # User.objects.get(username=current_user.username)
+            post.save()
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+            images = request.FILES.getlist('images')
+            for image in images:
+                Image.objects.create(post=post, image=image)
+
+            post_data = model_to_dict(post)
+            post_data['images'] = [image.image.url for image in post.images.all()]
+            return JsonResponse({
+                'message': 'Post and images added successfully!',
+                'post': post_data
+            }, status=201)
+
+        else:
+            return JsonResponse({'errors': form.errors}, status=400)
+
+    return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
 
 class PostUpdateAPIView(generics.UpdateAPIView):
     queryset = Post.objects.all()
