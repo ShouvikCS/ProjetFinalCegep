@@ -33,18 +33,24 @@ function AddComment({ postId }) {
             alert('Comment cannot be empty.');
         }
     };
-    
+
     return (
-        <Form onSubmit={submitComment}>  {/* Add the onSubmit handler here */}
-            <FormControl
-                as="textarea"
-                value={comment}
-                onChange={handleCommentChange}
-                placeholder="Write a comment..."
-            />
-            <Button type="submit" variant="success">Submit Comment</Button> {/* Change to type="submit" */}
-            <Button onClick={() => setShowInput(false)} variant="secondary" style={{ marginLeft: '10px' }}>Cancel</Button>
-        </Form>
+        <div>
+            {showInput ? (
+                <Form onSubmit={submitComment}>
+                    <FormControl
+                        as="textarea"
+                        value={comment}
+                        onChange={handleCommentChange}
+                        placeholder="Write a comment..."
+                    />
+                    <Button type="submit" variant="success">Submit Comment</Button>
+                    <Button onClick={() => setShowInput(false)} variant="secondary" style={{ marginLeft: '10px' }}>Cancel</Button>
+                </Form>
+            ) : (
+                <Button onClick={() => setShowInput(true)} variant="primary">Add a Comment</Button>
+            )}
+        </div>
     );
 }
 
