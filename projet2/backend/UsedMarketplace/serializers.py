@@ -22,7 +22,14 @@ class ImageSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'text', 'user', 'post']
+        fields = ['id', 'text', 'post', 'user']  # Include more fields as necessary
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        # Additional logic to handle creation if necessary
+        return Comment.objects.create(**validated_data)
 
 class PostSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)

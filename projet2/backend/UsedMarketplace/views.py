@@ -21,7 +21,7 @@ def PostCreateAPIView(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.user = User.objects.get(pk=2)   # User.objects.get(username=current_user.username)
+            post.user = User.objects.get(username=CurrentUser.objects.first().username)
             post.save()
 
             images = request.FILES.getlist('images')
@@ -78,8 +78,30 @@ class CommentListAPIView(generics.ListAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        post_id = self.kwargs['pk']
+        post_id = self.kwargs['post_id']
         return Comment.objects.filter(post_id=post_id)
+
+@csrf_exempt
+def add_comment_to_post(request, post_id):
+    import json
+    data = json.loads(request.body)
+    text = data.get('text')
+
+    try:
+        post = Post.objects.get(pk=post_id)
+        comment = Comment.objects.create(post=post, user=User.objects.get(username=CurrentUser.objects.first().username), text=text)
+        return JsonResponse({
+            'message': 'Comment added successfully!',
+            'comment': {
+                'id': comment.id,
+                'text': comment.text,
+                'user': comment.user.username
+            }
+        }, status=201)
+    except Post.DoesNotExist:
+        return JsonResponse({'error': 'Post not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 class UserPostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer

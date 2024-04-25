@@ -14,4 +14,5 @@ urlpatterns = [
     path('signup/', views.CustomSignupView.as_view(), name='signup'),
     path('current_user/', views.current_user, name='current_user'),
     path('posts/<int:post_id>/images/', views.PostImagesView.as_view(), name='post-images'),
+    path('posts/<int:post_id>/addcomment/', views.add_comment_to_post, name='add-comment'),
 ]
