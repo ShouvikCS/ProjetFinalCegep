@@ -8,7 +8,13 @@ const ImageSlideshow = ({ images }) => {
             <Slide easing="ease">
                 {images.map((image, index) => (
                     <div className="each-slide" key={index}>
-                        <div style={{'backgroundImage': `url(${image})`, height: '400px', backgroundSize: 'cover', backgroundPosition: 'center'}}>
+                        <div style={{
+                            'backgroundImage': `url(${image})`,
+                            height: '400px',
+                            backgroundSize: 'contain',  // Changed from 'cover' to 'contain'
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat'  // Ensures the image does not tile
+                        }}>
                         </div>
                     </div>
                 ))}

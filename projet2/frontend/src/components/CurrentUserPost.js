@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import ImageSlideshow from './ImageSlideshow';
 import AddComment from './AddComment';
-import { Card, Button, Collapse } from 'react-bootstrap';
+import { Card, Button, Collapse, Dropdown } from 'react-bootstrap';
+import './FormStyles.css';
 
 const CurrentUserPost = ({ post }) => {
     const [open, setOpen] = useState(false);
 
     return (
         <Card className="mb-4" border="success">
-            <Card.Header as="h5" className="bg-success text-white">
-                Posted by You: User {post.user - 1}
-            </Card.Header>
+            <Card.Header as="h5" className="bg-success text-white d-flex justify-content-between align-items-center">
+    <span>Posted by You: User {post.user}</span>
+    <Dropdown>
+        <Dropdown.Toggle variant="success" id="dropdown-basic" size="sm" className="custom-dropdown-toggle">
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu>
+            <Dropdown.Item href="#/edit">Edit</Dropdown.Item>
+            <Dropdown.Item href="#/delete">Delete</Dropdown.Item>
+        </Dropdown.Menu>
+    </Dropdown>
+</Card.Header>
+
             <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
                 <ImageSlideshow images={post.images.map(img => img.image)} />

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Form, Button, Container, FormGroup, Label, Input, Col, Alert } from 'react-bootstrap';
 
 function AddPost() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [images, setImages] = useState([]);
+    const [message, setMessage] = useState('');
 
     const handleFileChange = (event) => {
         if (event.target.files.length > 10) {
@@ -16,7 +18,6 @@ function AddPost() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
@@ -34,31 +35,48 @@ function AddPost() {
                 withCredentials: true
             });
             console.log(response.data);
-            alert('Post added successfully!');
+            setMessage('Post added successfully!');
         } catch (error) {
             console.error('There was an error adding the post:', error.response ? error.response.data : error);
+            setMessage('Failed to add post.');
         }
     };
 
     return (
-        <div>
-            <h2>Add Post</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Title:</label>
-                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-                </div>
-                <div>
-                    <label>Description:</label>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
-                </div>
-                <div>
-                    <label>Add Images Here (up to 10):</label>
-                    <input type="file" multiple onChange={handleFileChange} />
-                </div>
-                <button type="submit">Add Post</button>
-            </form>
-        </div>
+        <Container className="mt-5">
+            <h2 className="text-center mb-4" style={{ color: 'green' }}>Add Post</h2>
+            <Form onSubmit={handleSubmit}>
+                <FormGroup as={Col} controlId="formGridTitle">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Enter post title"
+                    />
+                </FormGroup>
+                <FormGroup as={Col} controlId="formGridDescription">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Enter post description"
+                    />
+                </FormGroup>
+                <FormGroup as={Col} controlId="formGridImages">
+                    <Form.Label>Add Images Here (up to 10)</Form.Label>
+                    <Form.Control
+                        type="file"
+                        multiple
+                        onChange={handleFileChange}
+                    />
+                </FormGroup>
+                <Button variant="success" type="submit" className="mt-3">Add Post</Button>
+            </Form>
+            {message && <Alert variant="info" className="mt-3">{message}</Alert>}
+        </Container>
     );
 }
 

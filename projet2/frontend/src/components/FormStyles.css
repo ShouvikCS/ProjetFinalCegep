@@ -13,3 +13,7 @@
     border-color: #3e8e41;
   }
   
+  .custom-dropdown-toggle:hover {
+    background-color: #2885a7; 
+    color: #ffffff;           
+}

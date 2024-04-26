@@ -25,6 +25,7 @@ const TopBar = () => {
           <Nav.Link as={Link} to="/">Home</Nav.Link>
           <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
           <Nav.Link as={Link} to="/posts">My Posts</Nav.Link>
+          <Nav.Link as={Link} to="/addpost">Add Post</Nav.Link>
           <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</Nav.Link> {/* Added logout link */}
         </Nav>
       </Navbar.Collapse>
