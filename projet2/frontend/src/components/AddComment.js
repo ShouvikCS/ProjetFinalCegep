@@ -24,7 +24,7 @@ function AddComment({ postId }) {
                 });
                 alert('Comment added successfully!');
                 setComment('');
-                setShowInput(false); // Optionally hide the input after submission
+                setShowInput(false); 
             } catch (error) {
                 console.error('Error submitting comment:', error.response ? error.response.data : error);
                 alert('Failed to add comment.');
@@ -48,7 +48,7 @@ function AddComment({ postId }) {
                     <Button onClick={() => setShowInput(false)} variant="secondary" style={{ marginLeft: '10px' }}>Cancel</Button>
                 </Form>
             ) : (
-                <Button onClick={() => setShowInput(true)} variant="primary">Add a Comment</Button>
+                <Button onClick={() => setShowInput(true)} variant="success">Add a Comment</Button>
             )}
         </div>
     );

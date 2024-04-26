@@ -169,7 +169,8 @@ def current_user(request):
         if current_user and current_user.logged_in:
             return JsonResponse({
                 'id': current_user.user_id,
-                'username': current_user.username
+                'username': current_user.username,
+                'logged_in': current_user.logged_in
             })
         else:
             return JsonResponse({'error': 'No currently logged-in user'}, status=404)

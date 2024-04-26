@@ -1,25 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import CurrentUserPost from './CurrentUserPost';
+import OtherUserPost from './OtherUserPost';
 
 function Dashboard() {
-    const [username, setUsername] = useState('');
+    const [posts, setPosts] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchCurrentUser = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:8000/current_user/', { withCredentials: true });
-                setUsername(response.data.username);
+                setCurrentUser({
+                    id: response.data.id,
+                    username: response.data.username
+                });
             } catch (error) {
-                console.error('Error fetching user data:', error);
+                console.error('Error fetching current user:', error);
+                setCurrentUser(null);
             }
         };
 
-        fetchUserData();
+
+        const fetchPosts = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/posts/', { withCredentials: true });
+                setPosts(response.data);
+            } catch (error) {
+                console.error("There was an error fetching the posts:", error);
+            }
+        };
+
+        fetchCurrentUser();
+        fetchPosts();
     }, []);
 
     return (
-        <div>
-            <h2>Welcome, {username}</h2>
+        <div style={{ padding: '20px' }}>
+            {posts.map((post) => (
+                currentUser && post.user === currentUser.id ?
+                <CurrentUserPost key={post.id} post={post} currentUser={currentUser} /> :
+                <br />
+            ))}
         </div>
     );
 }
