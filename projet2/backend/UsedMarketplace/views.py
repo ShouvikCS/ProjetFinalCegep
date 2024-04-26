@@ -138,6 +138,9 @@ def login_view(request):
         login(request, user)
         print(request.user, "request.user")
 
+        #delete all data in current user
+        CurrentUser.objects.all().delete()
+
         CurrentUser.objects.update_or_create(
             user_id=user.id,
             defaults={'username': user.username, 'logged_in': True}
@@ -151,8 +154,13 @@ def login_view(request):
 
     
 @require_http_methods(["POST"])
+@csrf_exempt
 def logout_view(request):
     logout(request)
+    CurrentUser.objects.update_or_create(
+        user_id=CurrentUser.objects.first().user_id,
+        defaults={'logged_in': False}
+    )
     return JsonResponse({"message": "Logged out successfully"}, status=200)
 
 
