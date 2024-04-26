@@ -23,14 +23,19 @@ class PostModelTest(TestCase):
 
 class PostCreateAPIViewTest(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='pass', email='user@example.com')  # Assuming email is required
-        self.client.login(username='testuser', password='pass')
+        self.user = User.objects.create_user(username='testuser', password='password123', email='test@example.com')
+        self.client.login(username='testuser', password='password123')
+        self.create_post_url = reverse('post-create')
 
     def test_create_post(self):
-        url = reverse('post-create')
-        data = {'title': 'New Post', 'description': 'New post description'}
-        response = self.client.post(url, data, format='json')
+        post_data = {
+            'title': 'New Test Post',
+            'description': 'Content of the new post',
+            'user': self.user.id  
+        }
+        response = self.client.post(self.create_post_url, post_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 
 class LoginViewTest(APITestCase):
     def setUp(self):
@@ -41,15 +46,135 @@ class LoginViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_login_failure(self):
-        response = self.client.post(reverse('login'), {'username': 'wrong', 'password': 'wrong'}, content_type='application/json')
+        response = self.client.post(reverse('login'), json.dumps({'username': 'wrong', 'password': 'wrong'}), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class LogoutViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password123')
+        self.client.login(username='testuser', password='password123')
+        self.logout_url = reverse('logout')
+
     def test_logout(self):
-       #not done yet
-        pass
+        response = self.client.post(self.logout_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 class SignupViewTest(APITestCase):
-    def test_signup(self):
-        # not done
-        pass
+    def setUp(self):
+        self.signup_url = reverse('signup')
+        self.user_data = {
+            "username": "newuser",
+            "email": "newuser@example.com",
+            "password": "newpassword"
+        }
+
+    def test_signup_success(self):
+        response = self.client.post(self.signup_url, self.user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertTrue(User.objects.filter(username=self.user_data['username']).exists())
+
+    def test_signup_with_existing_username(self):
+        User.objects.create_user(username=self.user_data['username'], email="test@example.com", password="password123")
+        
+        response = self.client.post(self.signup_url, self.user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+    def test_signup_with_invalid_data(self):
+        response = self.client.post(self.signup_url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error', response.data)
+
+
+class PostUpdateAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
+        self.post = Post.objects.create(title='Original Title', description='Original Description', user=self.user)
+        self.client.login(username='testuser', password='testpass123')
+
+    def test_update_post_success(self):
+        self.client.force_authenticate(user=self.user) 
+        post = Post.objects.create(title='Original Title', description='Original Description', user=self.user)
+        url = reverse('post-update', kwargs={'pk': post.id})
+        data = {'title': 'Updated Title', 'description': 'Updated Description'}
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        post.refresh_from_db()
+        self.assertEqual(post.title, 'Updated Title')
+
+
+    def test_update_post_unauthorized(self):
+        self.client.logout()
+        url = reverse('post-update', kwargs={'pk': self.post.id})
+        data = {'title': 'Unauthorized Update', 'description': 'Unauthorized Description'}
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class PostDeleteAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
+        self.post = Post.objects.create(title='Title to Delete', description='Description to Delete', user=self.user)
+        self.client.login(username='testuser', password='testpass123')
+
+    def test_delete_post_success(self):
+        url = reverse('post-delete', kwargs={'pk': self.post.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Post.objects.count(), 0)
+
+    def test_delete_post_unauthorized(self):
+        self.client.logout()
+        url = reverse('post-delete', kwargs={'pk': self.post.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class PostDetailAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
+        self.post = Post.objects.create(title='Detailed View Post', description='Detailed Description', user=self.user)
+
+    def test_get_post_detail_success(self):
+        url = reverse('post-detail', kwargs={'pk': self.post.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, self.post.title)
+
+    def test_get_post_detail_not_found(self):
+        url = reverse('post-detail', kwargs={'pk': 999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class CommentListAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password123', email='test@example.com')
+        self.post = Post.objects.create(title='Sample Post', description='Sample Description', user=self.user)
+        self.url = reverse('post-comments', kwargs={'pk': self.post.id})  # Ensure URL name and kwargs are correct.
+
+    def test_get_comments_success(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class AddCommentTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password123', email='test@example.com')
+        self.post = Post.objects.create(title='Sample Post', description='Sample Description', user=self.user)
+        self.comment_url = reverse('add-comment', kwargs={'post_id': self.post.id})
+        self.client.login(username='testuser', password='password123')
+
+    def test_add_comment_success(self):
+        comment_data = {'text': 'Great post!'}
+        response = self.client.post(self.comment_url, comment_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+
+    def test_add_comment_no_text(self):
+        url = reverse('add-comment', kwargs={'post_id': self.post.id})
+        data = {}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
