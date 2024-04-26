@@ -9,14 +9,14 @@ axios.defaults.withCredentials = true;
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();  // Hook for navigation
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://127.0.0.1:8000/login/', { username, password });
       console.log('Login successful:', response.data);
-      window.location.href = '/posts';; // Navigate upon success
+      window.location.href = '/posts';
     } catch (error) {
       console.error('Login failed:', error.response?.data);
     }

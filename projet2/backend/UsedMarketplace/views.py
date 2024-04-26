@@ -138,7 +138,6 @@ def login_view(request):
         login(request, user)
         print(request.user, "request.user")
 
-        #delete all data in current user
         CurrentUser.objects.all().delete()
 
         CurrentUser.objects.update_or_create(
@@ -164,9 +163,25 @@ def logout_view(request):
     return JsonResponse({"message": "Logged out successfully"}, status=200)
 
 
-class CustomSignupView(View):
-    def post(self, request):
-        return JsonResponse({'message': 'Signup successful'})
+@csrf_exempt
+@require_http_methods(["POST"])
+def signup_view(request):
+    data = json.loads(request.body)
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+
+    User = get_user_model()
+    if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+        return JsonResponse({"error": "User with this username or email already exists"}, status=400)
+
+    try:
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.save()
+        return JsonResponse({"message": "User created successfully"}, status=201)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
     
     
 
