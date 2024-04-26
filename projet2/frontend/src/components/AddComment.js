@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Form, FormControl } from 'react-bootstrap';
+import { Button, Form, FormControl, Alert } from 'react-bootstrap';
 
 function AddComment({ postId }) {
     const [showInput, setShowInput] = useState(false);
     const [comment, setComment] = useState('');
+    const [message, setMessage] = useState('');
 
     const handleCommentChange = (event) => {
         setComment(event.target.value);
@@ -12,6 +13,7 @@ function AddComment({ postId }) {
 
     const submitComment = async (event) => {
         event.preventDefault(); // Prevent default form submission behavior
+        setMessage(''); // Clear previous message
         if (comment.trim()) {
             try {
                 const response = await axios.post(`http://127.0.0.1:8000/posts/${postId}/addcomment/`, {
@@ -22,15 +24,15 @@ function AddComment({ postId }) {
                     },
                     withCredentials: true
                 });
-                alert('Comment added successfully!');
+                setMessage('Comment added successfully!');
                 setComment('');
-                setShowInput(false); 
+                setShowInput(false); // Optionally hide the input after submission
             } catch (error) {
                 console.error('Error submitting comment:', error.response ? error.response.data : error);
-                alert('Failed to add comment.');
+                setMessage('Failed to add comment.'); // Display error message
             }
         } else {
-            alert('Comment cannot be empty.');
+            setMessage('Comment cannot be empty.'); // Display message when comment is empty
         }
     };
 
@@ -50,6 +52,7 @@ function AddComment({ postId }) {
             ) : (
                 <Button onClick={() => setShowInput(true)} variant="success">Add a Comment</Button>
             )}
+            {message && <Alert variant="info" className="mt-3">{message}</Alert>}
         </div>
     );
 }

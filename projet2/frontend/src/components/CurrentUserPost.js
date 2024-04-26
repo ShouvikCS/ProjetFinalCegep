@@ -9,7 +9,7 @@ const CurrentUserPost = ({ post }) => {
     return (
         <Card className="mb-4" border="success">
             <Card.Header as="h5" className="bg-success text-white">
-                Posted by You: User {post.user}
+                Posted by You: User {post.user - 1}
             </Card.Header>
             <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
