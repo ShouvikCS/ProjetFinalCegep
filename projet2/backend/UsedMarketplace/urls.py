@@ -15,4 +15,7 @@ urlpatterns = [
     path('current_user/', views.current_user, name='current_user'),
     path('posts/<int:post_id>/images/', views.PostImagesView.as_view(), name='post-images'),
     path('posts/<int:post_id>/addcomment/', views.add_comment_to_post, name='add-comment'),
+    path('messages/create/', views.create_message, name='create-message'),
+    path('messages/conversation/<int:user_id>/', views.ConversationView.as_view(), name='get-conversation'),
+
 ]

@@ -7,13 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.generic import View
 from rest_framework.authtoken.models import Token
-from .models import CurrentUser, Post, Comment, User, Image
-from .serializers import CommentSerializer, PostSerializer, UserSerializer, ImageSerializer
+from .models import CurrentUser, Post, Comment, User, Image, Message
+from .serializers import CommentSerializer, PostSerializer, UserSerializer, ImageSerializer, MessageSerializer
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.forms.models import model_to_dict
 from .forms import PostForm
+from django.db.models import Q
 
 @csrf_exempt
 def PostCreateAPIView(request):
@@ -48,7 +49,13 @@ class PostUpdateAPIView(generics.UpdateAPIView):
 class PostDeleteAPIView(generics.DestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  
+    
+    def delete(self, request, *args, **kwargs):
+        post = self.get_object()
+        if post.user != request.user:
+            return Response({'detail': 'You do not have permission to delete this post.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().delete(request, *args, **kwargs)
 
 class PostListAPIView(generics.ListAPIView):
     queryset = Post.objects.all()
@@ -207,3 +214,45 @@ class PostImagesView(View):
         images = Image.objects.filter(post_id=post_id)
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data)
+    
+class ConversationView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, user_id):
+        current_user = CurrentUser.objects.first()
+        messages = Message.objects.filter(
+            (Q(sender=current_user, recipient_id=user_id) | Q(sender_id=user_id, recipient=current_user))
+        ).order_by('timestamp')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+    
+@csrf_exempt
+def create_message(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            text = data['text']
+            recipient_id = data['recipient_id']
+
+            sender = request.user 
+            recipient = User.objects.get(pk=recipient_id)
+
+            message = Message.objects.create(sender=sender, recipient=recipient, text=text)
+
+            return JsonResponse({
+                'message': 'Message sent successfully!',
+                'data': {
+                    'id': message.id,
+                    'text': message.text,
+                    'sender': message.sender.username,
+                    'recipient': message.recipient.username
+                }
+            }, status=201)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Recipient not found'}, status=404)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key in data: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method'}, status=405)

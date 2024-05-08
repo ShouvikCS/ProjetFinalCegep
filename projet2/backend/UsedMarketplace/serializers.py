@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Post, Image, Comment
+from .models import User, Post, Image, Comment, Message
 from django.contrib.auth import get_user_model
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,7 +28,6 @@ class CommentSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        # Additional logic to handle creation if necessary
         return Comment.objects.create(**validated_data)
 
 class PostSerializer(serializers.ModelSerializer):
@@ -40,9 +39,20 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'user', 'images', 'comments']
 
     def create(self, validated_data):
-        # Extract user_id from validated_data and then remove it
         user_id = validated_data.pop('user_id', None)
         if user_id:
-            user = get_user_model().objects.get(id=user_id)  # Retrieve the User instance
+            user = get_user_model().objects.get(id=user_id) 
             validated_data['user'] = user
         return super(PostSerializer, self).create(validated_data)
+    
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    recipient = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'recipient', 'content', 'timestamp']
+
+    def create(self, validated_data):
+        return Message.objects.create(**validated_data)
+    
