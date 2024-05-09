@@ -14,11 +14,11 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Fetch the current user on initial load
+    
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:8000/current_user/', { withCredentials: true });
-        setCurrentUser(response.data);  // Assuming response.data contains user data and logged in status
+        setCurrentUser(response.data); 
       } catch (error) {
         console.error('Error fetching current user:', error);
         setCurrentUser(null);
@@ -40,6 +40,7 @@ function App() {
           <Route path="/posts" element={<AllPosts />} />
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/modifypost/:postId" element={<ModifyPost />} />
+          <Route path="/messages/:userId" element={<div>Messages</div>} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       </div>
