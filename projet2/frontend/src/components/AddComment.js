@@ -12,8 +12,8 @@ function AddComment({ postId }) {
     };
 
     const submitComment = async (event) => {
-        event.preventDefault(); // Prevent default form submission behavior
-        setMessage(''); // Clear previous message
+        event.preventDefault(); 
+        setMessage('');
         if (comment.trim()) {
             try {
                 const response = await axios.post(`http://127.0.0.1:8000/posts/${postId}/addcomment/`, {
@@ -24,15 +24,15 @@ function AddComment({ postId }) {
                     },
                     withCredentials: true
                 });
-                setMessage('Comment added successfully!');
+                setMessage('Ajouté!');
                 setComment('');
-                setShowInput(false); // Optionally hide the input after submission
+                setShowInput(false); 
             } catch (error) {
                 console.error('Error submitting comment:', error.response ? error.response.data : error);
-                setMessage('Failed to add comment.'); // Display error message
+                setMessage('Erreur lors de l\'ajout du commentaire.');
             }
         } else {
-            setMessage('Comment cannot be empty.'); // Display message when comment is empty
+            setMessage('Ne peut pas être vide.'); 
         }
     };
 
@@ -44,13 +44,13 @@ function AddComment({ postId }) {
                         as="textarea"
                         value={comment}
                         onChange={handleCommentChange}
-                        placeholder="Write a comment..."
+                        placeholder="Écrire un commentaire..."
                     />
-                    <Button type="submit" variant="success">Submit Comment</Button>
-                    <Button onClick={() => setShowInput(false)} variant="secondary" style={{ marginLeft: '10px' }}>Cancel</Button>
+                    <Button type="submit" variant="success">Soumettre</Button>
+                    <Button onClick={() => setShowInput(false)} variant="secondary" style={{ marginLeft: '10px' }}>Annuler</Button>
                 </Form>
             ) : (
-                <Button onClick={() => setShowInput(true)} variant="success">Add a Comment</Button>
+                <Button onClick={() => setShowInput(true)} variant="success">Ajouter un commentaire</Button>
             )}
             {message && <Alert variant="info" className="mt-3">{message}</Alert>}
         </div>

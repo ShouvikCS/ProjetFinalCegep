@@ -25,17 +25,17 @@ function Login() {
   return (
     <Card className="auth-card">
       <Card.Body>
-        <Card.Title>Login</Card.Title>
+        <Card.Title>Connexion</Card.Title>
         <Form onSubmit={handleLogin}>
           <Form.Group controlId="loginUsername">
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Utilisateur</Form.Label>
             <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter username" />
           </Form.Group>
           <Form.Group controlId="loginPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Mot de Passe</Form.Label>
             <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
           </Form.Group>
-          <Button variant="success" type="submit">Login</Button>
+          <Button variant="success" type="submit">Se Connecter</Button>
         </Form>
       </Card.Body>
     </Card>

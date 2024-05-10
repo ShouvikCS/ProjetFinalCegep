@@ -42,29 +42,29 @@ function SignupPage() {
   return (
     <Card className="auth-card">
       <Card.Body>
-        <Card.Title>Sign Up</Card.Title>
+        <Card.Title>Inscription</Card.Title>
         <Form onSubmit={handleSignup}>
           <Form.Group controlId="signupUsername">
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Utilisateur</Form.Label>
             <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter username" />
             {errors.username && <small className="text-danger">{errors.username}</small>}
           </Form.Group>
           <Form.Group controlId="signupEmail">
-            <Form.Label>Email</Form.Label>
+            <Form.Label>Courriel</Form.Label>
             <Form.Control type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
             {errors.email && <small className="text-danger">{errors.email}</small>}
           </Form.Group>
           <Form.Group controlId="signupPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Mot de Passe</Form.Label>
             <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
             {errors.password && <small className="text-danger">{errors.password}</small>}
           </Form.Group>
           <Form.Group controlId="confirmPassword">
-            <Form.Label>Confirm Password</Form.Label>
+            <Form.Label>Confirmer Mot de Passe</Form.Label>
             <Form.Control type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" />
             {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
           </Form.Group>
-          <Button variant="success" type="submit">Sign Up</Button>
+          <Button variant="success" type="submit">S'inscrire</Button>
           {message && <div className="mt-3">
             <Alert variant={errors ? "danger" : "success"}>{message}</Alert>
           </div>}

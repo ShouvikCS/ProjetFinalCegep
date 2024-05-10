@@ -15,9 +15,9 @@ const OtherUserPost = ({ post }) => {
     return (
         <Card className="mb-4" border="black">
             <Card.Header as="h5" className="d-flex justify-content-between align-items-center">
-                <span>Posted by: User {post.user - 1}</span>
+                <span>Par: User {post.user - 1}</span>
                 <Button variant="outline-primary" size="sm" onClick={handleContactClick}>
-                    Contact
+                    Contacter
                 </Button>
             </Card.Header>
             <Card.Body>
@@ -32,7 +32,7 @@ const OtherUserPost = ({ post }) => {
                     aria-expanded={open}
                     variant="outline-secondary"
                 >
-                    {open ? 'Hide Comments' : 'Show Comments'}
+                    {open ? 'Cacher' : 'Montrer Commentaires'}
                 </Button>
                 <Collapse in={open}>
                     <div id="example-collapse-text">
@@ -40,12 +40,12 @@ const OtherUserPost = ({ post }) => {
                             post.comments.map((comment) => (
                                 <Card key={comment.id} className="mt-3">
                                     <Card.Body>
-                                        <Card.Text><strong>User {comment.user} says:</strong> {comment.text}</Card.Text>
+                                        <Card.Text><strong>User {comment.user} dit:</strong> {comment.text}</Card.Text>
                                     </Card.Body>
                                 </Card>
                             ))
                         ) : (
-                            <Card.Text className="mt-3">No comments yet.</Card.Text>
+                            <Card.Text className="mt-3">Aucun commentaire.</Card.Text>
                         )}
                         <AddComment postId={post.id} />
                     </div>
