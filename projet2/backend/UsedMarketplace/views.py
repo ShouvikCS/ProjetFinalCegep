@@ -219,40 +219,49 @@ class ConversationView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, user_id):
-        current_user = CurrentUser.objects.first()
+        current_user = User.objects.get(username=CurrentUser.objects.first().username)
+        other_user = User.objects.get(pk=user_id)
         messages = Message.objects.filter(
-            (Q(sender=current_user, recipient_id=user_id) | Q(sender_id=user_id, recipient=current_user))
+            (Q(sender=current_user, recipient=other_user) | Q(sender=other_user, recipient=current_user))
         ).order_by('timestamp')
         serializer = MessageSerializer(messages, many=True)
+        print(serializer.data)
         return Response(serializer.data)
     
 @csrf_exempt
 def create_message(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            text = data['text']
-            recipient_id = data['recipient_id']
-
-            sender = request.user 
-            recipient = User.objects.get(pk=recipient_id)
-
-            message = Message.objects.create(sender=sender, recipient=recipient, text=text)
-
-            return JsonResponse({
-                'message': 'Message sent successfully!',
-                'data': {
-                    'id': message.id,
-                    'text': message.text,
-                    'sender': message.sender.username,
-                    'recipient': message.recipient.username
-                }
-            }, status=201)
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'Recipient not found'}, status=404)
-        except KeyError as e:
-            return JsonResponse({'error': f'Missing key in data: {str(e)}'}, status=400)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    else:
+    import logging
+    logger = logging.getLogger(__name__)
+    if request.method != 'POST':
         return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
+    try:
+        data = json.loads(request.body)
+        text = data['text']
+        recipient_id = data['recipient_id']
+
+        current_user = CurrentUser.objects.first()
+        if not current_user:
+            return JsonResponse({'error': 'No current user set'}, status=404)
+
+        sender = User.objects.get(username=current_user.username)
+        recipient = User.objects.get(pk=recipient_id)
+
+        message = Message.objects.create(sender=sender, recipient=recipient, content=text)
+        return JsonResponse({
+            'message': 'Message sent successfully!',
+            'data': {
+                'id': message.id,
+                'text': message.content,
+                'sender': sender.username,
+                'recipient': recipient.username
+            }
+        }, status=201)
+    except User.DoesNotExist:
+        logger.exception("User not found")
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except KeyError as e:
+        logger.exception("Missing key in data")
+        return JsonResponse({'error': f'Missing key in data: {str(e)}'}, status=400)
+    except Exception as e:
+        logger.exception("Unhandled exception")
+        return JsonResponse({'error': str(e)}, status=500)

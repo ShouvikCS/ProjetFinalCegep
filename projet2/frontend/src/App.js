@@ -9,6 +9,7 @@ import AllPosts from './components/AllPosts';
 import AddPost from './components/AddPost';
 import ModifyPost from './components/ModifyPost';
 import TopBar from './components/TopBar';
+import Messages from './components/Messages';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -40,7 +41,7 @@ function App() {
           <Route path="/posts" element={<AllPosts />} />
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/modifypost/:postId" element={<ModifyPost />} />
-          <Route path="/messages/:userId" element={<div>Messages</div>} />
+          <Route path="/messages/:userId" element={<Messages />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       </div>

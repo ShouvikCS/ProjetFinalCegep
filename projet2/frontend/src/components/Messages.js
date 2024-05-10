@@ -7,28 +7,34 @@ function Messages() {
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
-    const { userId } = useParams();  // This captures "3" from "/messages/3"
+    const { userId } = useParams();  
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchCurrentUser = async () => {
             try {
-                const userResponse = await axios.get('http://127.0.0.1:8000/current_user/', { withCredentials: true });
-                setCurrentUser(userResponse.data);
+                const response = await axios.get('http://127.0.0.1:8000/current_user/', { withCredentials: true });
+                setCurrentUser(response.data);
+                fetchMessages(response.data.id); 
             } catch (error) {
-                console.error('Error fetching user data:', error);
+                console.error('Error fetching current user:', error);
+                setCurrentUser(null);
             }
         };
 
-        const fetchMessages = async () => {
+        const fetchMessages = async (currentUserId) => {
             try {
-                const messagesResponse = await axios.get(`http://127.0.0.1:8000/messages/between/${currentUser.id}/${userId}/`, { withCredentials: true });
-                setMessages(messagesResponse.data);
+                const messagesResponse = await axios.get(`http://127.0.0.1:8000/messages/${userId}/`, { withCredentials: true });
+                console.log("Fetched messages:", messagesResponse.data);
+                setMessages(messagesResponse.data.map(msg => ({
+                    ...msg,
+                    isCurrentUser: msg.sender === currentUserId
+                })));
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
         };
 
-        fetchUserData().then(fetchMessages);
+        fetchCurrentUser();
     }, [userId]);
 
     const handleSendMessage = async (event) => {
@@ -40,8 +46,8 @@ function Messages() {
             }, {
                 withCredentials: true
             });
-            setMessages([...messages, response.data.data]);  // Add new message to local state
-            setMessageText('');  // Clear input field
+            setMessages([...messages, { ...response.data, isCurrentUser: true }]);
+            setMessageText('');  
         } catch (error) {
             console.error('Error sending message:', error);
         }
@@ -54,9 +60,9 @@ function Messages() {
                     <h2>Messages</h2>
                     <ListGroup>
                         {messages.map((msg, index) => (
-                            <ListGroup.Item key={index} className={`d-flex justify-content-${msg.sender === currentUser.id ? 'end' : 'start'}`}>
-                                <div className={`p-3 rounded bg-${msg.sender === currentUser.id ? 'primary text-white' : 'light'}`}>
-                                    {msg.text}
+                            <ListGroup.Item key={index} className={`d-flex justify-content-${msg.isCurrentUser ? 'end' : 'start'}`}>
+                                <div className={`p-3 rounded bg-${msg.isCurrentUser ? 'primary text-white' : 'light'}`}>
+                                   {msg.isCurrentUser ? '' : "User " + msg.sender + ":"} <strong>{msg.content} </strong>
                                 </div>
                             </ListGroup.Item>
                         ))}

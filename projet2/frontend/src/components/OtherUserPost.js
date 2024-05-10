@@ -1,15 +1,24 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ImageSlideshow from './ImageSlideshow';
 import AddComment from './AddComment';
 import { Card, Button, Collapse } from 'react-bootstrap';
 
 const OtherUserPost = ({ post }) => {
     const [open, setOpen] = React.useState(false);
+    const navigate = useNavigate(); // Hook for redirecting
+
+    const handleContactClick = () => {
+        navigate(`/messages/${post.user}`); // Redirect to the messages page for this user
+    };
 
     return (
         <Card className="mb-4" border="black">
-            <Card.Header as="h5">
-                Posted by: User {post.user - 1}
+            <Card.Header as="h5" className="d-flex justify-content-between align-items-center">
+                <span>Posted by: User {post.user - 1}</span>
+                <Button variant="outline-primary" size="sm" onClick={handleContactClick}>
+                    Contact
+                </Button>
             </Card.Header>
             <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
