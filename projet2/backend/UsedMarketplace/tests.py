@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from .models import Post, Comment
+from .models import Post, Comment, Message, CurrentUser
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -181,3 +181,51 @@ class AddCommentTest(APITestCase):
         # response = self.client.post(self.url, {'text': ''}, format='json')
         # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         pass
+
+class MessageViewTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.sender = User.objects.create_user(username='sender', password='test123')
+        cls.recipient = User.objects.create_user(username='recipient', password='test123')
+        cls.current_user = CurrentUser.objects.create(user=cls.sender, username=cls.sender.username)
+        
+       
+        for i in range(5):
+            Message.objects.create(sender=cls.sender, recipient=cls.recipient, content=f"Message {i}")
+
+    def test_get_conversation(self):
+        url = reverse('conversation', kwargs={'user_id': self.recipient.id})
+        self.client.force_authenticate(user=self.sender)  
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 5) 
+
+    def test_create_message_success(self):
+        url = reverse('create_message')
+        data = {'text': 'Hello, World!', 'recipient_id': self.recipient.id}
+        self.client.force_authenticate(user=self.sender)  
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Message.objects.count(), 6) 
+
+    def test_create_message_no_recipient(self):
+        url = reverse('create_message')
+        data = {'text': 'Hello, World!'}  
+        self.client.force_authenticate(user=self.sender)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_message_user_not_found(self):
+        url = reverse('create_message')
+        data = {'text': 'Hello again!', 'recipient_id': 999}
+        self.client.force_authenticate(user=self.sender)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_message_no_current_user(self):
+       
+        CurrentUser.objects.all().delete()  
+        url = reverse('create_message')
+        data = {'text': 'No current user', 'recipient_id': self.recipient.id}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
